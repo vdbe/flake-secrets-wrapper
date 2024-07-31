@@ -1,4 +1,4 @@
-specialArgs@{ lib, ... }:
+specialArgs@{ config, lib, ... }:
 let
 
   secretsHosts = {
@@ -25,6 +25,27 @@ let
 in
 {
   inherit hosts;
+
+  keys = {
+    stage0 = [
+      {
+        id = "stage0";
+        key = "age1cfwll67ak9fq4wd8m3w8l07wjhau9uckx5qdwm7mctm6lgqtmv7qmwgrvl";
+        desc = "key used for bootstraping";
+      }
+    ];
+  };
+
+  secretFiles = {
+    stage0 = {
+      file = ./stage0/default.sops.yaml;
+      keys = config.masterKeys;
+    };
+    apiKeys = {
+      file = ./stage0/api_keys.sops.yaml;
+      keys = config.masterKeys;
+    };
+  };
 
   masterKeys = [
     {

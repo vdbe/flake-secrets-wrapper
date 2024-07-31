@@ -21,7 +21,7 @@ let
           ];
         };
         key = mkOption { type = types.str; };
-        id = mkOption { type = types.nullOr (types.strMatching "[a-z_-]{3,}"); };
+        id = mkOption { type = types.nullOr (types.strMatching "[a-z0-9_-]{3,}"); };
         desc = mkOption { type = types.nullOr types.str; };
 
       };
@@ -70,6 +70,7 @@ let
         modules = [ sopsFileOpts ];
       }
     );
+  sopsFileType = sopsFileTypeWithDefaultKeys [ ];
 
   hostSecretOpts =
     { name, config, ... }:
@@ -106,6 +107,15 @@ let
       };
       hosts = mkOption {
         type = types.attrsOf (types.submodule hostSecretOpts);
+        default = { };
+      };
+      keys = mkOption {
+        type = types.attrsOf sopsKeyType;
+        description = "Extra key groups to be used elsewhere";
+        default = { };
+      };
+      secretFiles = mkOption {
+        type = types.attrsOf sopsFileType;
         default = { };
       };
     };

@@ -1,44 +1,54 @@
 keys:
   - &master_key age1t0gga8pltprn6ggy6lfq73x5lt5yh2ctyarh000ejx4ahnlnh4kqr3ull7
-  - &server02 age13cwyduwmygwryyq28tggpwx6eupja4ad8mdxyfcla9yncvuzya6sgd9qe6
-  - &server01 age1j2wjd2dxw0kw7jssnkfr9nmfqeqgr38qcdwh4fhkadnvnndd8cns6z9208
-  - &server01_file age10vttwn7ucjd92jp7mlkc7kam7g264wpxum0hkljulhgzv9la3atq4gef85
-  - &server02_file age10dv7rs9w9u42evv26syqspnfd6pnsfvdqlz88uvfwzgvwzju95tsafw2y9
+  - &system02 age13cwyduwmygwryyq28tggpwx6eupja4ad8mdxyfcla9yncvuzya6sgd9qe6
+  - &system01 age1j2wjd2dxw0kw7jssnkfr9nmfqeqgr38qcdwh4fhkadnvnndd8cns6z9208
+  - &stage0 age1cfwll67ak9fq4wd8m3w8l07wjhau9uckx5qdwm7mctm6lgqtmv7qmwgrvl
+  - &system01_file age10vttwn7ucjd92jp7mlkc7kam7g264wpxum0hkljulhgzv9la3atq4gef85
+  - &system02_file age10dv7rs9w9u42evv26syqspnfd6pnsfvdqlz88uvfwzgvwzju95tsafw2y9
 
 creation_rules:
+  - path_regex: ^(stage0/api_keys.sops.yaml)$
+    key_groups:
+      - age:
+        - *master_key
+  - path_regex: ^(stage0/default.sops.yaml)$
+    key_groups:
+      - age:
+        - *master_key
   - path_regex: ^(common/default.sops.yaml)$
     key_groups:
       - age:
         - *master_key
-        - *server02
-        - *server01
+        - *system02
+        - *system01
   - path_regex: ^(system/system01/default.sops.yaml)$
     key_groups:
       - age:
         - *master_key
-        - *server01
+        - *system01
   - path_regex: ^(system/system01/extraSecrets.sops.yaml)$
     key_groups:
       - age:
         - *master_key
-        - *server01
+        - *system01
   - path_regex: ^(system/system01/user.sops.yaml)$
     key_groups:
       - age:
         - *master_key
-        - *server01_file
+        - *stage0
+        - *system01_file
   - path_regex: ^(system/system02/default.sops.yaml)$
     key_groups:
       - age:
         - *master_key
-        - *server02
+        - *system02
   - path_regex: ^(system/system02/extraSecrets.sops.yaml)$
     key_groups:
       - age:
         - *master_key
-        - *server02
+        - *system02
   - path_regex: ^(system/system02/user.sops.yaml)$
     key_groups:
       - age:
         - *master_key
-        - *server02_file
+        - *system02_file

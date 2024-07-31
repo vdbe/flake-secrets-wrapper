@@ -141,6 +141,11 @@ class SecretFile:
         for key_value in to_be_updated_key_values:
             final_keys.append(key_collection.keys_by_value[key_value][0])
 
+        for i, key in enumerate(final_keys):
+            for j, key2 in enumerate(final_keys[i + 1 :]):
+                if key.value == key2.value and key.id == key2.id:
+                    final_keys.pop(i + j + 1)
+
         self.keys = final_keys
 
 
@@ -224,6 +229,25 @@ def main():
         )
         keys.add_key(key)
 
+    for _, sf in secrets_config["secretFiles"].items():
+        secret_file_keys = []
+        for k in sf["keys"]:
+            key_type = str_to_key_type(k["type"])
+
+            key = Key(
+                KeyWeight.SECRET_FILE,
+                key_type,
+                k["key"],
+                desc=k["desc"],
+                context=["file"],
+                id=k["id"],
+            )
+            secret_file_keys.append(key)
+            keys.add_key(key)
+
+        secret_file = SecretFile(sf["file"], secret_file_keys)
+        secret_files.append(secret_file)
+
     hosts = secrets_config["hosts"]
     for host_name, host in hosts.items():
         for host_key in host["keys"]:
@@ -235,6 +259,7 @@ def main():
                 host_key["key"],
                 desc=host_key["desc"],
                 context=[host_name],
+                id=host_key["id"],
             )
             keys.add_key(key)
 
@@ -249,6 +274,7 @@ def main():
                     k["key"],
                     desc=k["desc"],
                     context=[host_name, "file"],
+                    id=k["id"],
                 )
                 secret_file_keys.append(key)
                 keys.add_key(key)
