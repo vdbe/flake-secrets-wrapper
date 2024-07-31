@@ -1,0 +1,9 @@
+# nix build artifacts
+result*
+repl-result-out*
+
+# dev shell
+.direnv/
+.env*
+!.env.template
+!.envrc.template
