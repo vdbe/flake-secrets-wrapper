@@ -1,11 +1,12 @@
 
+secretsDir:
 {
   lib ? (import <nixpkgs> { }).lib,
-  secretsDir ? ./template/simple,
   ...
 }:
 {
-  options.secrets = import ./secretsModule.nix  {inherit  lib secretsDir;};
+  options.secrets = (import ./secretsModule.nix  {inherit  lib
+    secretsDir;}).options;
   # config = {
   #   secrets = import secretsDir specialArgs;
   # };
