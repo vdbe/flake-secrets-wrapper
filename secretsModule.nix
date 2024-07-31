@@ -81,6 +81,10 @@ let
         dir = mkOption { type = types.path; };
         email = mkOption { type = types.str; };
         secretFiles = mkOption { type = types.attrsOf (sopsFileTypeWithDefaultKeys config.keys); };
+        extra = mkOption {
+          type = types.attrsOf types.anything;
+          default = { };
+        };
       };
       config = {
         host = mkDefault name;
@@ -116,6 +120,10 @@ let
       };
       secretFiles = mkOption {
         type = types.attrsOf sopsFileType;
+        default = { };
+      };
+      extra = mkOption {
+        type = types.attrsOf types.anything;
         default = { };
       };
     };
