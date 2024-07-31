@@ -3,8 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    sops-nix-wrapper = {
-      url = "github:vdbe/sops-nix-wrapper";
+    flake-secrets-wrapper = {
+      url = "github:vdbe/flake-secrets-wrapper";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         systems.follows = "systems";
@@ -15,8 +15,13 @@
   };
 
   outputs =
-    { self, nixpkgs, sops-nix-wrapper,... }:
-    let 
+    {
+      self,
+      nixpkgs,
+      flake-secrets-wrapper,
+      ...
+    }:
+    let
       inherit (nixpkgs) lib;
 
       forAllSystems =
@@ -32,13 +37,15 @@
         );
 
       secretsDir = ./.;
-      config = import sops-nix-wrapper.outPath {inherit lib secretsDir;};
-      config' = import (sops-nix-wrapper.outPath + "/convertConfigPaths.nix") {inherit lib secretsDir config;};
+      config = import flake-secrets-wrapper.outPath { inherit lib secretsDir; };
+      config' = import (flake-secrets-wrapper.outPath + "/convertConfigPaths.nix") {
+        inherit lib secretsDir config;
+      };
     in
     {
       inherit config;
 
-      nixosModules.default = sops-nix-wrapper.nixodModules.default;
+      nixosModules.default = flake-secrets-wrapper.nixodModules.default;
 
       packages = forAllSystems (
         pkgs:
@@ -46,7 +53,9 @@
           configJson = pkgs.writeText "configJson" (builtins.toJSON config');
 
           generate-sops-yaml = pkgs.writeShellScriptBin "generate-sops-yaml" ''
-            exec ${sops-nix-wrapper.packages.${pkgs.system}.generate-sops-yaml-script}/bin/generate-sops-yaml ${configJson}
+            exec ${
+              flake-secrets-wrapper.packages.${pkgs.system}.generate-sops-yaml-script
+            }/bin/generate-sops-yaml ${configJson}
           '';
 
         in

@@ -1,5 +1,5 @@
 specialArgs@{
-  lib ? (import <nixpkgs> {}).lib,
+  lib ? (import <nixpkgs> { }).lib,
   secretsDir ? ./template/simple,
   ...
 }:

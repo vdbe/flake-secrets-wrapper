@@ -1,1 +1,1 @@
-# sops-nix-wrapper
+# flake-secrets-wrapper

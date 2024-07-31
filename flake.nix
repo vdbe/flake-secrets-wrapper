@@ -9,10 +9,7 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      ...
-    }:
+    { nixpkgs, ... }:
     let
       inherit (nixpkgs) lib;
 
@@ -32,7 +29,7 @@
         inherit lib;
         secretsDir = ./template/simple;
       };
-      config' = import ./convertConfigPaths.nix {inherit config lib;};
+      config' = import ./convertConfigPaths.nix { inherit config lib; };
     in
     {
       formatter = forAllSystems (pkgs: pkgs.nixfmt-rfc-style);
