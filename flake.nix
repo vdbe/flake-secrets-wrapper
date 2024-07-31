@@ -4,8 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
-    # secrets.url = "github:vdbe/sops-nix-wrapper?dir=template/simple";
-
     systems.url = "github:nix-systems/default";
 
   };
@@ -13,14 +11,10 @@
   outputs =
     {
       nixpkgs,
-      # secrets,
       ...
     }:
     let
       inherit (nixpkgs) lib;
-      inherit (builtins) toString isPath;
-      inherit (lib.attrsets) mapAttrsRecursive;
-      inherit (lib.strings) removeSuffix removePrefix;
 
       forAllSystems =
         function:
@@ -36,10 +30,9 @@
 
       config = import ./default.nix {
         inherit lib;
-        # secretsDir = secrets;
+        secretsDir = ./template/simple;
       };
-      root = removeSuffix "flake.nix" (toString config.flakePath);
-      config' = mapAttrsRecursive (_: v: if (isPath v) then removePrefix root (toString v) else v) config;
+      config' = import ./convertConfigPaths.nix {inherit config lib;};
     in
     {
       formatter = forAllSystems (pkgs: pkgs.nixfmt-rfc-style);
@@ -53,11 +46,13 @@
         };
       };
 
+      nixosModules.default = import ./nixosModule.nix;
+
       devShells = forAllSystems (pkgs: {
         default = pkgs.callPackage ./shell.nix { };
       });
 
-      inherit config;
+      inherit config config';
 
       packages = forAllSystems (
         pkgs:
@@ -80,9 +75,8 @@
 
         in
         {
-          inherit generate-sops-yaml configJson;
+          inherit generate-sops-yaml configJson generate-sops-yaml-script;
         }
       );
-
     };
 }
