@@ -116,6 +116,11 @@ class KeyCollection:
                         key_with_generated_id.context.append(i + 1)
                     else:
                         raise ValueError("key should always have an id")
+
+        for i, key in enumerate(self.keys):
+            for j, key2 in enumerate(self.keys[i + 1 :]):
+                if key.value == key2.value and key.id == key2.id:
+                    self.keys.pop(i + j + 1)
         self.sort()
 
 
