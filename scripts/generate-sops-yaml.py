@@ -77,6 +77,7 @@ class KeyCollection:
     def merge(self):
         fixed_ids: set[str] = set()
         self.keys = list(dict.fromkeys(self.keys))
+        tmp: list[Key] = []
 
         # Check if there are no 2 keys with the same fixed id
         for id, keys in self.keys_by_id.items():
@@ -117,10 +118,18 @@ class KeyCollection:
                     else:
                         raise ValueError("key should always have an id")
 
+        # print(len(self.keys))
         for i, key in enumerate(self.keys):
-            for j, key2 in enumerate(self.keys[i + 1 :]):
-                if key.value == key2.value and key.id == key2.id:
-                    self.keys.pop(i + j + 1)
+            # print("i", i)
+            for j, key2 in enumerate(tmp):
+                if key.value == key2.value:
+                    if key.id == key2.id or key.weight < key2.weight:
+                        # print("break")
+                        break
+            else:
+                tmp.append(key)
+        # print(len(tmp))
+        self.keys = tmp
         self.sort()
 
 
@@ -133,24 +142,32 @@ class SecretFile:
         self.keys.append(key)
 
     def update_keys(self, key_collection: KeyCollection):
-        final_keys: list[Key] = key_collection.master_keys.copy()
+        final_keys: list[Key] = []
+        tmp_final_keys: list[Key] = []
         to_be_updated_keys: list[Key] = []
 
-        for key in self.keys:
+        for key in [*key_collection.master_keys.copy(), *self.keys]:
             if key.id_fixed:
-                final_keys.append(key)
+                tmp_final_keys.append(key)
             else:
                 to_be_updated_keys.append(key)
+        # print("tmp_final_keys", len(tmp_final_keys))
 
         to_be_updated_key_values = set([k.value for k in to_be_updated_keys])
         for key_value in to_be_updated_key_values:
-            final_keys.append(key_collection.keys_by_value[key_value][0])
+            tmp_final_keys.append(key_collection.keys_by_value[key_value][0])
+        # print("tmp_final_keys", len(tmp_final_keys))
 
-        for i, key in enumerate(final_keys):
-            for j, key2 in enumerate(final_keys[i + 1 :]):
-                if key.value == key2.value and key.id == key2.id:
-                    final_keys.pop(i + j + 1)
+        for i, key in enumerate(tmp_final_keys):
+            for j, key2 in enumerate(final_keys):
+                if key.value == key2.value:
+                    if key.id == key2.id or key.weight < key2.weight:
+                        break
+            else:
+                # print("append")
+                final_keys.append(key)
 
+        # print(len(final_keys))
         self.keys = final_keys
 
 
